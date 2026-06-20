@@ -1,0 +1,362 @@
+body {
+  margin: 0;
+  padding: 0;
+  color: #333333;
+  font-family: 'Helvetica Neue', AppleSDGothicNeo, sans-serif;
+  display: flex;
+  justify-content: center;
+  overscroll-behavior-y: contain;
+  /* 기존에 있던 background 설정들을 여기서 모두 지웁니다 */
+}
+
+/* 💡 [최적화] 배경 전용 레이어를 따로 만들어 스크롤 연산 부하를 0으로 만듭니다 */
+body::before {
+  content: "";
+  position: fixed; /* 배경을 화면에 고정 */
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: -1; /* 맨 뒤로 보내기 */
+  
+  /* 여기에 기존 그라데이션 코드를 넣습니다 */
+  background: linear-gradient(
+    70deg,
+    #ffffff 0%,
+    #ffffff 20%,
+    rgba(0, 0, 0, 0.02) 20.1%,
+    rgba(0, 0, 0, 0.02) 20.5%,
+    #ffffff 48%,
+    rgba(0, 0, 0, 0.04) 48.1%,
+    rgba(0, 0, 0, 0.04) 49.5%,
+    #ffffff 64%,
+    rgba(0, 0, 0, 0.02) 78.1%,
+    rgba(0, 0, 0, 0.02) 79.0%,
+    #ffffff 79.1%,
+    #ffffff 100%
+  );
+}
+
+/* 모달이 활성화되었을 때 백그라운드 본문 스크롤을 방지하는 클래스 */
+body.modal-open {
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  padding-bottom: 100px;
+  background-color: rgba(255, 255, 255, 0.95); /* 투명도를 0.92에서 0.95로 살짝 올려 글씨 가독성 확보 */
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.03);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #000000;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+  margin-top: 80px;
+  text-align: left;
+}
+
+.content-wrap {
+  padding: 0 20px;
+  text-align: left;
+}
+
+/* 인트로 영역 */
+.main-photo {
+  width: 100%;
+  height: 65vh;
+  background-color: #f0f0f0;
+  object-fit: cover;
+  display: block;
+}
+
+.intro-wrap {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.names-wrap {
+  margin-bottom: 70px;
+  text-align: center;
+}
+
+.name-row {
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  line-height: 2;
+  color: #000000;
+}
+
+.name-row .relation {
+  font-size: 16px;
+  color: #888888;
+  margin: 0 4px;
+}
+
+.message { font-size: 16px; font-weight: 300; line-height: 2.2; margin-bottom: 60px; color: #333333; }
+
+.info-box {
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  padding: 40px 10px;
+  text-align: center;
+}
+.info-label { font-size: 11px; font-weight: bold; letter-spacing: 3px; color: #aaaaaa; margin-bottom: 8px; }
+.info-main { font-size: 26px; font-weight: 300; color: #000000; margin-bottom: 6px; letter-spacing: -0.5px; }
+.info-sub { font-size: 15px; color: #555555; margin-bottom: 35px; }
+.info-sub:last-child { margin-bottom: 0; }
+
+.d-day-wrap {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.d-day-text {
+  font-size: 25px;
+  font-weight: 300;
+  color: #333333;
+  letter-spacing: 1px;
+}
+
+/* 연락처 영역 */
+.contact-box {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eeeeee;
+  padding: 20px 0;
+}
+.contact-box:last-child { border-bottom: none; }
+.contact-name { font-size: 16px; font-weight: 500; }
+.contact-relation { font-size: 12px; color: #888888; margin-bottom: 8px; }
+.contact-btns a {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  border: 1px solid #dddddd;
+  border-radius: 50%;
+  color: #333333;
+  text-decoration: none;
+  margin-left: 8px;
+  font-size: 15px;
+}
+
+/* 갤러리 영역 */
+.gallery-main {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.gallery-main-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.gallery-main.active { opacity: 1; }
+.gallery-main.fade-out { opacity: 0; transform: scale(1.05); }   
+
+.gallery-thumbnails {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-left: 20px;
+  padding-bottom: 5px;
+  scrollbar-width: none;
+  margin-top: 15px;
+  -webkit-overflow-scrolling: touch;
+}
+.gallery-thumbnails::-webkit-scrollbar { display: none; }
+
+.gallery-thumbnail {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  object-fit: cover;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.gallery-thumbnail.active {
+  opacity: 1;
+  border: 2px solid #333333;
+  box-sizing: border-box;
+}
+
+.gallery-container { position: relative; }
+.nav-btn {
+  background: rgba(255,255,255,0.7); border: none; cursor: pointer; padding: 10px;
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
+}
+.prev { left: 0; }
+.next { right: 0; }
+
+/* 지도 영역 */
+.root_daum_roughmap { width: 100% !important; box-sizing: border-box; }
+.root_daum_roughmap .wrap_map { width: 100% !important; }
+
+.transit-info { margin-bottom: 25px; }
+.transit-title { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #888888; margin-bottom: 6px; }
+.transit-desc { font-size: 14px; color: #333333; line-height: 1.6; }
+
+/* 계좌 영역 */
+.account-group { margin-bottom: 40px; }
+.account-group-title { font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-bottom: 15px; color: #000000; border-bottom: 1px solid #dddddd; padding-bottom: 10px; }
+.account-row { display: flex; gap: 8px; align-items: flex-start;}
+.account-item { flex: 1; background-color: #fafafa; padding: 15px 10px; border: 1px solid #eeeeee; box-sizing: border-box; display: flex; flex-direction: column;}
+.account-bank { font-size: 12px; font-weight: bold; margin-bottom: 15px; line-height: 1.4; word-break: keep-all; }
+.account-number { font-size: 12px; color: #333333; display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.5s ease, opacity 0.5s ease; }
+.account-number.show { grid-template-rows: 1fr; opacity: 1; margin-bottom: 15px; }
+.account-number-inner { overflow: hidden; }
+.account-btns { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.btn-view, .btn-copy { width: 100%; padding: 8px 0; background-color: #ffffff; border: 1px solid #333333; color: #333333; font-size: 11px; letter-spacing: 1px; cursor: pointer; text-align: center; }
+
+/* 방명록 영역 */
+.guestbook-form input, .guestbook-form textarea { width: 100%; box-sizing: border-box; border: 1px solid #dddddd; padding: 12px; margin-bottom: 10px; font-family: inherit; }
+.guestbook-form textarea { height: 100px; resize: none; }
+.btn-submit { width: 100%; padding: 15px; background-color: #000000; color: #ffffff; border: none; font-size: 14px; letter-spacing: 2px; cursor: pointer; }
+.guest-list { margin-top: 30px; }
+.guest-item { border-bottom: 1px solid #eeeeee; padding: 15px 0; }
+.guest-name { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+.guest-msg { font-size: 14px; color: #555555; line-height: 1.5; }
+
+/* 모달 뷰어 영역 */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  
+  /* 💡 [최적화] 모달 역시 blur 필터를 지우고 화이트 톤으로 대체 */
+  background-color: rgba(255, 255, 255, 0.98); 
+  
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease; /* 0.4초가 답답하게 느껴진다면 0.3s로 살짝 줄여보세요 */
+}
+
+.modal-overlay.open { opacity: 1; }
+
+.modal-body-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 450px;
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.open .modal-body-wrap { transform: translateY(0) scale(1); }
+
+.modal-content-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease;
+  opacity: 1;
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform, opacity;
+  transform: translateZ(0); 
+}
+
+#modalImage.fade-out-next { opacity: 0; transform: translateX(-20px); }
+#modalImage.fade-out-prev { opacity: 0; transform: translateX(20px); }
+#modalImage.fade-in-active { opacity: 0; transform: scale(0.95); }
+
+.modal-close {
+  position: absolute;
+  top: 25px; right: 25px;
+  color: #333333;
+  font-size: 35px;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.modal-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #333333;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 20px;
+  z-index: 10000;
+  user-select: none;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.modal-nav-btn:hover { opacity: 1; }
+.modal-prev { left: 5px; }
+.modal-next { right: 5px; }
+
+.modal-thumbnails-container {
+  width: 100%;
+  margin-top: 25px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.modal-thumbnails {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  justify-content: flex-start; 
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.modal-thumbnails::-webkit-scrollbar { display: none; }
+
+.modal-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  opacity: 0.3;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+.modal-thumb.active { opacity: 1; border: 1.5px solid #333333; }
+
+/* 애니메이션 기초 효과 */
+.fade-in-up { opacity: 0; transform: translateY(30px); transition: all 1.5s ease-out; }
+.fade-in-up.active { opacity: 1; transform: translateY(0); }
+
+.btn-copy, .btn-view, .gallery-thumbnail { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.btn-copy:active, .btn-view:active, .gallery-thumbnail:active { transform: scale(0.95); }
+.gallery-thumbnail:hover { transform: scale(1.05); }
+
+.end-wrap { padding: 80px 20px; text-align: center; }
+.end-wrap.active { opacity: 1; }
+.end-logo { font-size: 32px; font-weight: 200; letter-spacing: 10px; margin-bottom: 20px; color: #000000; }
+.end-text { font-size: 13px; color: #888; letter-spacing: 1px; }

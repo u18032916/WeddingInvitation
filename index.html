@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>박현준 ♡ 이나연</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="fade-in-up">
+      <img src="images/kingboo.png" alt="" class="main-photo">
+    </div>
+    
+    <div class="intro-wrap">
+      <div class="fade-in-up">
+        <div class="names-wrap">
+          <div class="name-row">박재성 · 조훈 <span class="relation">님의 장남</span> 박현준</div>
+          <div class="name-row">강미경 <span class="relation">님의 장녀</span> 이나연</div>
+        </div>
+        <div class="message">
+          오랜 시간의 기다림 끝에<br>
+          저희 두 사람, 하나의 길을 걷고자 합니다.<br>
+          그 시작의 자리에 소중한 분들을 초대합니다.
+        </div>
+      </div>
+      
+      <div class="d-day-wrap">
+        <div class="d-day-text" id="dDay">--</div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">DATE</div>
+        <div class="info-main">2026. 09. 19</div>
+        <div class="info-sub">토요일 오후 12시 30분</div>
+
+        <div class="info-label">LOCATION</div>
+        <div class="info-main">드레스 가든 청담</div>
+        <div class="info-sub">서울특별시 강남구 영동대로 707(청담동)</div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section-title">CONTACT</div>
+      
+      <div class="contact-box">
+        <div>
+          <div class="contact-relation">GROOM</div>
+          <div class="contact-name">신랑 박현준</div>
+        </div>
+        <div class="contact-btns">
+          <a href="tel:010-0000-0000">📞</a>
+          <a href="sms:010-0000-0000">✉️</a>
+        </div>
+      </div>
+
+      <div class="contact-box">
+        <div>
+          <div class="contact-relation">BRIDE</div>
+          <div class="contact-name">신부 이나연</div>
+        </div>
+        <div class="contact-btns">
+          <a href="tel:010-0000-0000">📞</a>
+          <a href="sms:010-0000-0000">✉️</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section-title">GALLERY</div>
+      
+      <div class="gallery-main-container" onclick="openModal()" style="cursor: pointer;">
+        <img src="images/kingboo.png" class="gallery-main active" id="mainImage1">
+        <img src="" class="gallery-main" id="mainImage2">
+      </div>
+      
+      <div class="gallery-container" style="position: relative; display: flex; align-items: center;">
+        <button class="nav-btn prev" onclick="scrollGallery(-1)">◀</button>
+        
+        <div class="gallery-thumbnails" id="thumbContainer">
+          <img src="images/kingboo.png" class="gallery-thumbnail active">
+          <img src="images/kingboo2.png" class="gallery-thumbnail">
+          <img src="images/kingboo3.png" class="gallery-thumbnail">
+          <img src="images/kingboo.png" class="gallery-thumbnail">
+          <img src="images/kingboo2.png" class="gallery-thumbnail">
+          <img src="images/kingboo3.png" class="gallery-thumbnail">
+          <img src="images/kingboo.png" class="gallery-thumbnail">
+          <img src="images/kingboo2.png" class="gallery-thumbnail">
+          <img src="images/kingboo3.png" class="gallery-thumbnail">
+          <img src="images/kingboo.png" class="gallery-thumbnail">
+          <img src="images/kingboo.png" class="gallery-thumbnail">
+        </div>
+        
+        <button class="nav-btn next" onclick="scrollGallery(1)">▶</button>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section-title">DIRECTIONS</div>
+      
+      <div id="daumRoughmapContainer1781423724685" class="root_daum_roughmap root_daum_roughmap_landing"></div>
+      <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"></script>
+      <script charset="UTF-8">
+          new daum.roughmap.Lander({
+              "timestamp" : "1781423724685",
+              "key" : "pi429r3ywoe",
+              "mapWidth" : "100%",
+              "mapHeight" : "360"
+          }).render();
+      </script>
+        
+      <br><br>
+      
+      <div class="transit-info">
+        <div class="transit-title">SUBWAY</div>
+        <div class="transit-desc">ㅇㅇ역 1번 출구에서 도보 5분</div>
+      </div>
+      <div class="transit-info">
+        <div class="transit-title">PARKING</div>
+        <div class="transit-desc">건물 지하 1층 주차장 이용 가능 (2시간 무료)</div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section-title">ACCOUNT</div>
+      
+      <div class="account-group">
+        <div class="account-group-title">GROOM SIDE</div>
+        <div class="account-row">
+          <div class="account-item">
+            <div class="account-bank">신랑 박현준</div>
+            <div class="account-number"><div class="account-number-inner">KB국민은행 718202-01-129470<br>예금주 박현준</div></div>
+            <div class="account-btns">
+              <button class="btn-view">계좌번호 보기</button>
+              <button class="btn-copy">복사하기</button>
+            </div>
+          </div>
+          <div class="account-item">
+            <div class="account-bank">신랑 혼주측</div>
+            <div class="account-number"><div class="account-number-inner">ㅇㅇ은행 123-456-7890</div></div>
+            <div class="account-btns">
+              <button class="btn-view">계좌번호 보기</button>
+              <button class="btn-copy">복사하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-group">
+        <div class="account-group-title">BRIDE SIDE</div>
+        <div class="account-row">
+          <div class="account-item">
+            <div class="account-bank">신부 이나연</div>
+            <div class="account-number"><div class="account-number-inner">ㅇㅇ은행 123-456-7890</div></div>
+            <div class="account-btns">
+              <button class="btn-view">계좌번호 보기</button>
+              <button class="btn-copy">복사하기</button>
+            </div>
+          </div>
+          <div class="account-item">
+            <div class="account-bank">신부 혼주측</div>
+            <div class="account-number"><div class="account-number-inner">ㅇㅇ은행 123-456-7890</div></div>
+            <div class="account-btns">
+              <button class="btn-view">계좌번호 보기</button>
+              <button class="btn-copy">복사하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section-title">GUESTBOOK</div>
+      
+      <div class="guestbook-form">
+        <input type="text" placeholder="이름을 입력해주세요">
+        <textarea placeholder="축하의 메시지를 남겨주세요"></textarea>
+        <button class="btn-submit">메시지 남기기</button>
+      </div>
+
+      <div class="guest-list">
+        <div class="guest-item">
+          <div class="guest-name">친구 김ㅇㅇ</div>
+          <div class="guest-msg">결혼 너무 축하해! 앞으로 꽃길만 걷자!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="end-wrap">
+      <div class="end-logo">H & N</div>
+      <div class="end-text">저희의 시작을 축하해주셔서 감사합니다.</div>
+    </div>
+  </div> 
+
+  <div id="photoModal" class="modal-overlay">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <button class="modal-nav-btn modal-prev" onclick="moveModalImage(-1)">&#10094;</button>
+    
+    <div class="modal-body-wrap">
+      <div class="modal-content-wrap">
+        <img id="modalImage" src="" alt="크게 보기">
+      </div>
+      <div class="modal-thumbnails-container">
+        <div class="modal-thumbnails" id="modalThumbContainer"></div>
+      </div>
+    </div>
+
+    <button class="modal-nav-btn modal-next" onclick="moveModalImage(1)">&#10095;</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
