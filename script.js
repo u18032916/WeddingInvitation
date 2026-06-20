@@ -1,3 +1,4 @@
+// 전역 상태 변수
 let currentImgIndex = 0;
 let allImages = [];
 
@@ -8,14 +9,12 @@ let startDistance = 0;
 let currentScale = 1;
 let lastScale = 1;
 let translateX = 0, translateY = 0;
-let lastTranslateX = 0, lastTranslateY = 0;
 let dragStartX = 0, dragStartY = 0;
 
 let animationFrameId = null;
-let touchStartX = 0;
-let touchEndX = 0;
+let touchStartX = 0, touchEndX = 0;
 
-// DOM 캐싱
+// DOM 요소 캐싱
 let cachedModalImg = null;
 let cachedMainThumbnails = null;
 let cachedModalThumbs = null;
@@ -24,13 +23,12 @@ let cachedImg2 = null;
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    // 2. 이미지 프리로딩
-    const thumbnails = document.querySelectorAll('.gallery-thumbnail');
-    thumbnails.forEach(thumb => {
+    // 1. 이미지 프리로딩
+    document.querySelectorAll('.gallery-thumbnail').forEach(thumb => {
         const img = new Image(); img.src = thumb.src;
     });
 
-    // 3. 갤러리 썸네일 매핑 및 동적 생성
+    // 2. 갤러리 썸네일 매핑 및 모달 하단 썸네일 노드 동적 생성
     cachedMainThumbnails = document.querySelectorAll('.gallery-thumbnail');
     allImages = Array.from(cachedMainThumbnails).map(thumb => thumb.src);
     cachedImg1 = document.getElementById('mainImage1');
@@ -50,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
         cachedModalThumbs = document.querySelectorAll('.modal-thumb');
     }
 
-    // 4. D-Day 및 기타 인터랙션 (계좌, 스크롤 애니메이션 등)
+    // 3. D-Day 계산 로직
     const weddingDate = new Date('2026-09-19');
     const diffDays = Math.ceil((weddingDate - new Date()) / (1000 * 60 * 60 * 24));
     const dDayElement = document.getElementById('dDay');
@@ -58,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
         dDayElement.innerText = diffDays > 0 ? `D - ${diffDays}` : (diffDays === 0 ? `D-Day` : `D + ${Math.abs(diffDays)}`);
     }
 
+    // 4. 계좌번호 기능 인터랙션 (토글 및 복사)
     document.querySelectorAll('.btn-view').forEach(button => {
         button.addEventListener('click', function() {
             const numberDiv = this.closest('.account-item').querySelector('.account-number');
@@ -80,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // 5. 갤러리 메인 이미지 클릭 교체 페이드 애니메이션
     let isImg1Active = true;
     cachedMainThumbnails.forEach(thumb => {
         thumb.addEventListener('click', function() {
@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // 6. 스크롤 등장 애니메이션 메모리 최적화
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -104,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // 💡 5. 모바일 터치 제스처 (확대/축소 끊김 현상 완벽 해결 최적화 버전)
+    // 💡 7. 모바일 터치 제스처 (확대, 이동, 스와이프 로직 완벽 결합)
     const modalContentWrap = document.querySelector('.modal-content-wrap');
     cachedModalImg = document.getElementById('modalImage');
 
@@ -112,43 +113,48 @@ document.addEventListener("DOMContentLoaded", function() {
         modalContentWrap.addEventListener('touchstart', function(e) {
             if (e.touches.length === 1) {
                 if (currentScale > 1) {
+                    // 확대 상태: 드래그(이동) 시작 좌표 기록
                     isDragging = true;
                     dragStartX = e.touches[0].clientX - translateX;
                     dragStartY = e.touches[0].clientY - translateY;
                 } else if (!isZooming) {
+                    // 1배율 상태: 스와이프 준비
                     touchStartX = e.touches[0].screenX;
                 }
             } else if (e.touches.length === 2) {
-                // 핀치 줌 진입 시 변형 애니메이션을 즉시 제거하여 손가락 움직임과 1:1로 실시간 동기화
-                cachedModalImg.style.transition = 'none';
+                // 두 손가락: 핀치 줌 시작 (애니메이션 끄기)
+                cachedModalImg.style.transition = 'none'; 
                 isZooming = true;
                 isDragging = false;
                 startDistance = getTouchDistance(e.touches[0], e.touches[1]);
-                lastScale = currentScale; // 현재 배율을 정확히 유지
+                lastScale = currentScale;
             }
         }, { passive: true });
 
         modalContentWrap.addEventListener('touchmove', function(e) {
-            if (iscurrentScale > 1) e.preventDefault(); // 기본 스크롤 방지
+            // [오타 수정 완료] 스크롤 방지 로직
+            if (currentScale > 1 || isZooming) e.preventDefault(); 
             
             if (!animationFrameId) {
                 animationFrameId = requestAnimationFrame(() => {
                     if (isDragging && e.touches.length === 1 && currentScale > 1) {
+                        // 확대 후 사진 이동 거리 계산
                         translateX = e.touches[0].clientX - dragStartX;
                         translateY = e.touches[0].clientY - dragStartY;
                         
-                        const maxBoundX = (window.innerWidth * currentScale) / 2.5;
-                        const maxBoundY = (window.innerHeight * currentScale) / 2.5;
+                        // 화면 바깥으로 벗어나지 않게 바운더리 락 적용
+                        const maxBoundX = (window.innerWidth * currentScale) / 3;
+                        const maxBoundY = (window.innerHeight * currentScale) / 3;
                         translateX = Math.max(Math.min(translateX, maxBoundX), -maxBoundX);
                         translateY = Math.max(Math.min(translateY, maxBoundY), -maxBoundY);
 
                         updateTransform();
                     } 
                     else if (isZooming && e.touches.length === 2) {
+                        // 핀치 줌 배율 계산 (최대 3배수)
                         const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
                         if (startDistance > 0) {
                             const scaleFactor = currentDistance / startDistance;
-                            // 최소 1배에서 최대 3배까지 튀는 현상 없이 정밀 제어
                             currentScale = Math.min(Math.max(lastScale * scaleFactor, 1), 3);
                             updateTransform();
                         }
@@ -164,23 +170,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 animationFrameId = null;
             }
 
+            // 터치 종료 시 드래그 상태 해제
             if (isDragging && e.touches.length === 0) {
                 isDragging = false;
-                lastTranslateX = translateX;
-                lastTranslateY = translateY;
             }
             
+            // 줌 종료 시 배율 유지 및 원상 복구 판정
             if (isZooming && e.touches.length < 2) {
                 isZooming = false;
-                lastScale = currentScale; // 손을 떼는 순간의 배율을 오차 없이 그대로 고정
+                lastScale = currentScale;
                 
-                // 1배율에 아주 가까워졌을 때만 부드럽게 원래 크기로 리셋
-                if (currentScale < 1.05) {
+                // 배율이 1에 근접하게 돌아오면 완전히 1배율로 자석처럼 맞춤
+                if (currentScale <= 1.05) {
                     resetZoom();
                 }
             }
 
-            // 스와이프 판정 (정확히 1배율 상태에서만 작동하도록 제한)
+            // 스와이프 제스처 판정
             if (currentScale === 1 && e.changedTouches.length === 1 && !isZooming && !isDragging) {
                 touchEndX = e.changedTouches[0].screenX;
                 handleSwipe();
@@ -188,16 +194,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }, { passive: true });
     }
 
-    // 💡 6. 히스토리 API 백버튼 감지 (뒤로가기 누르면 모달만 닫기)
+    // 💡 8. 히스토리 API 백버튼 감지 (뒤로가기로 모달만 닫기)
     window.addEventListener('popstate', function() {
         const modal = document.getElementById('photoModal');
         if (modal && modal.classList.contains('open') && location.hash !== '#gallery') {
-            closeModalUI(); // 브라우저 주소창 #gallery가 없어지면 모달 닫기
+            closeModalUI();
         }
     });
 });
 
-// 유틸 & 전역 함수들
+// ==================
+// 공통 및 UI 업데이트 함수들
+// ==================
+
 function scrollGallery(direction) {
     const container = document.getElementById('thumbContainer');
     if (container) container.scrollBy({ left: direction * 200, behavior: 'smooth' });
@@ -214,24 +223,21 @@ function openModal() {
         document.body.classList.add('modal-open');
         modal.style.display = 'flex';
         
-        // 💡 브라우저 주소창에 가짜 히스토리(#gallery) 추가하여 뒤로가기 방어 구축
+        // 브라우저 히스토리 기록 추가 (가짜 주소)
         history.pushState({ modal: true }, '', '#gallery');
         
         setTimeout(() => { modal.classList.add('open'); }, 10); 
     }
 }
 
-// X 버튼을 누를 때
 function closeModal() {
-    // 직접 닫는 대신 브라우저 뒤로가기를 강제 실행하여 popstate 이벤트를 유도 (깔끔한 히스토리 관리)
     if (location.hash === '#gallery') {
-        history.back(); 
+        history.back(); // 뒤로가기를 강제로 실행하여 popstate 이벤트 유도
     } else {
         closeModalUI();
     }
 }
 
-// 실제 모달을 화면에서 숨기는 함수
 function closeModalUI() {
     const modal = document.getElementById('photoModal');
     if (modal) {
@@ -244,7 +250,7 @@ function closeModalUI() {
 }
 
 function moveModalImage(direction) {
-    if (!cachedModalImg || currentScale > 1) return; // 확대된 상태에선 버튼 이동 차단
+    if (!cachedModalImg || currentScale > 1) return; // 확대 상태에서는 넘기기 버튼 막기
     
     const outClass = direction === 1 ? 'fade-out-next' : 'fade-out-prev';
     cachedModalImg.classList.add(outClass);
@@ -303,23 +309,20 @@ function getTouchDistance(touch1, touch2) {
     return Math.sqrt(Math.pow(touch1.screenX - touch2.screenX, 2) + Math.pow(touch1.screenY - touch2.screenY, 2));
 }
 
-// 💡 렌더링 성능을 위해 Translate3D와 Scale을 동시 적용하는 함수
+// Translate3D와 Scale을 함께 적용하여 GPU 하드웨어 가속 처리
 function updateTransform() {
     if (cachedModalImg) {
         cachedModalImg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${currentScale})`;
     }
 }
 
-// 줌 & 이동 상태를 모두 1배율 중앙으로 원상복구
+// 줌 및 이동 상태 초기화
 function resetZoom() {
     if (cachedModalImg) {
         cachedModalImg.style.transition = 'transform 0.25s ease-out, opacity 0.2s ease';
         currentScale = 1; lastScale = 1;
         translateX = 0; translateY = 0;
-        lastTranslateX = 0; lastTranslateY = 0;
-        
         updateTransform();
-        
         setTimeout(() => { cachedModalImg.style.transition = 'opacity 0.2s ease'; }, 250);
     }
 }
