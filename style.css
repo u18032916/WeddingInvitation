@@ -1,3 +1,8 @@
+img, button, a, [onclick] {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
 body {
   margin: 0;
   padding: 0;
