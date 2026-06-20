@@ -23,6 +23,25 @@ let cachedImg2 = null;
 
 document.addEventListener("DOMContentLoaded", function() {
 
+    const intro = document.getElementById('introCinematic');
+    const hasEntered = sessionStorage.getItem('wedding-intro-passed');
+
+    if (hasEntered === 'true') {
+        // 이미 입장한 하객이라면 인트로 레이어를 흔적도 없이 즉시 제거
+        if (intro) intro.remove();
+    } else {
+        // 처음 방문한 경우라면 뒤로가기 누를 때 모달처럼 꼬이지 않게 가짜 해시 히스토리 하나 생성
+        history.pushState({ intro: true }, '', '#welcome');
+    }
+
+    // 뒤로가기를 눌렀을 때 인트로가 다시 살아나는 현상을 방어하는 핵심 팝스테이트
+    window.addEventListener('popstate', function(e) {
+        if (location.hash !== '#welcome' && intro && !intro.classList.contains('fade-out')) {
+            // 인트로 상태에서 폰 뒤로가기를 누르면 사이트가 꺼지는 게 아니라 강제로 입장 처리 유도
+            enterInvitation();
+        }
+    });
+
     // 1. 이미지 프리로딩
     document.querySelectorAll('.gallery-thumbnail').forEach(thumb => {
         const img = new Image(); img.src = thumb.src;
@@ -57,13 +76,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 4. 계좌번호 기능 인터랙션 (토글 및 복사)
-    document.querySelectorAll('.btn-view').forEach(button => {
-        button.addEventListener('click', function() {
-            const numberDiv = this.closest('.account-item').querySelector('.account-number');
-            numberDiv.classList.toggle('show');
-            this.innerText = numberDiv.classList.contains('show') ? '숨기기' : '계좌번호 보기';
-        });
-    });
 
     document.querySelectorAll('.btn-copy').forEach(button => {
         button.addEventListener('click', function() {
@@ -247,7 +259,12 @@ function closeModalUI() {
 }
 
 function moveModalImage(direction) {
-    if (!cachedModalImg || currentScale > 1) return; 
+    if (!cachedModalImg) return;
+    
+    // 1. 만약 확대된 상태(currentScale > 1)라면 즉시 배율과 드래그 위치를 1배율 중앙으로 초기화
+    if (currentScale > 1) {
+        resetZoom();
+    }
     
     const outClass = direction === 1 ? 'fade-out-next' : 'fade-out-prev';
     cachedModalImg.classList.add(outClass);
@@ -319,5 +336,29 @@ function resetZoom() {
         translateX = 0; translateY = 0;
         updateTransform();
         setTimeout(() => { cachedModalImg.style.transition = 'opacity 0.2s ease'; }, 250);
+    }
+}
+
+// 💡 [추가] 인트로 창을 닫고 음악을 틀며 본문으로 진입하는 함수
+function enterInvitation() {
+    const intro = document.getElementById('introCinematic');
+    const audio = document.getElementById('weddingBgm');
+    
+    if (intro) {
+        intro.classList.add('fade-out'); // 인트로 레이어 페이드아웃
+        setTimeout(() => intro.remove(), 800); // 0.8초 후 DOM에서 완전히 삭제
+    }
+
+    // 브라우저 락이 풀렸으므로 무한반복 BGM 재생 시작!
+    if (audio && audio.paused) {
+        audio.play().catch(err => console.log("BGM 자동재생 실패 방어:", err));
+    }
+
+    // 세션에 입장 기록을 각인하여 뒤로가기/새로고침 시 인트로 재출현 차단
+    sessionStorage.setItem('wedding-intro-passed', 'true');
+    
+    // 주소창의 #welcome 가짜 해시 지우기
+    if (location.hash === '#welcome') {
+        history.replaceState(null, '', location.pathname + location.search);
     }
 }
