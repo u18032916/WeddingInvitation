@@ -139,23 +139,35 @@ document.addEventListener("DOMContentLoaded", function() {
         }, { passive: true });
     }
 
-    // 8. 모바일 터치 스와이프 제스처 이벤트 리스너 정의
+    // 8. 모바일 터치 스와이프 제스처 이벤트 리스너 정의 (스와이프 오작동 완벽 차단)
     const modalContentWrap = document.querySelector('.modal-content-wrap');
     if (modalContentWrap) {
         modalContentWrap.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
+            // 💡 손가락이 정확히 '하나'일 때만 스와이프 시작 좌표를 기록하여 줌 동작과 분리합니다.
+            if (e.touches.length === 1 && !isZooming) {
+                touchStartX = e.touches[0].screenX;
+            }
         }, { passive: true });
 
         modalContentWrap.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
+            // 💡 현재 두 손가락으로 조작 중이거나, 이미 사진이 확대된 상태(1배 초과)라면 스와이프를 작동시키지 않고 차단합니다.
+            if (isZooming || currentScale > 1.05) {
+                return; 
+            }
+            
+            // 손가락이 단 하나일 때만 스와이프 제스처로 최종 인정합니다.
+            if (e.changedTouches.length === 1) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }
         }, { passive: true });
     }
 
-    // 9. 고성능 핀치 줌 최적화 이벤트 리스너 정의
+    // 9. 고성능 핀치 줌 최적화 이벤트 리스너 정의 (안전 장치 추가)
     cachedModalImg = document.getElementById('modalImage');
     if (modalContentWrap && cachedModalImg) {
         modalContentWrap.addEventListener('touchstart', function(e) {
+            // 두 손가락이 닿는 순간 즉시 줌 상태를 true로 만들고 좌우 스와이프를 잠금 장치로 잠급니다.
             if (e.touches.length === 2) {
                 isZooming = true;
                 startDistance = getTouchDistance(e.touches[0], e.touches[1]);
@@ -183,12 +195,19 @@ document.addEventListener("DOMContentLoaded", function() {
             if (isZooming) {
                 lastScale = currentScale;
                 if (e.touches.length < 2) {
-                    isZooming = false;
+                    // 💡 사진 크기가 완전히 1배로 원래대로 돌아오면, 0.3초 딜레이(복원 애니메이션 시간) 후에 스와이프 잠금을 안전하게 풀어줍니다.
+                    if (currentScale < 1.1) {
+                        resetZoom();
+                        setTimeout(() => { isZooming = false; }, 300);
+                    } else {
+                        // 확대한 상태로 손을 떼면 확대를 유지하고 스와이프 잠금 상태도 계속 이어갑니다.
+                        setTimeout(() => { isZooming = false; }, 300);
+                    }
+                    
                     if (animationFrameId) {
                         cancelAnimationFrame(animationFrameId);
                         animationFrameId = null;
                     }
-                    if (currentScale < 1.1) resetZoom();
                 }
             }
         }, { passive: true });
