@@ -360,23 +360,3 @@ body.modal-open {
 .end-wrap.active { opacity: 1; }
 .end-logo { font-size: 32px; font-weight: 200; letter-spacing: 10px; margin-bottom: 20px; color: #000000; }
 .end-text { font-size: 13px; color: #888; letter-spacing: 1px; }
-
-.btn-kakao {
-  display: block;
-  width: 50%;
-  max-width: 300px;
-  margin: 30px auto 0;
-  padding: 15px;
-  background-color: #FEE500; /* 카카오 공식 옐로우 */
-  color: #000000;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.btn-kakao:active {
-  transform: scale(0.96);
-}

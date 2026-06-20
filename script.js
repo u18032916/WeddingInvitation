@@ -1,6 +1,3 @@
-// 💡 카카오톡 앱 키 설정 (본인의 JavaScript 키로 교체하세요)
-const KAKAO_KEY = "27a0857ad8e1873544022ffcc2b76c3c"; 
-
 let currentImgIndex = 0;
 let allImages = [];
 
@@ -26,19 +23,6 @@ let cachedImg1 = null;
 let cachedImg2 = null;
 
 document.addEventListener("DOMContentLoaded", function() {
-
-    // 1. 카카오톡 SDK 초기화
-    if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
-        Kakao.init(KAKAO_KEY);
-    }
-    const btnKakaoShare = document.getElementById('btnKakaoShare');
-    if (btnKakaoShare) {
-        btnKakaoShare.addEventListener('click', function() {
-            Kakao.Share.sendScrap({
-                requestUrl: location.href // 현재 사이트 주소의 OG태그를 긁어서 카톡으로 보냄
-            });
-        });
-    }
 
     // 2. 이미지 프리로딩
     const thumbnails = document.querySelectorAll('.gallery-thumbnail');
@@ -120,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // 💡 5. 모바일 터치 제스처 (드래그, 스와이프, 줌 통합 최적화)
+    // 💡 5. 모바일 터치 제스처 (확대/축소 끊김 현상 완벽 해결 최적화 버전)
     const modalContentWrap = document.querySelector('.modal-content-wrap');
     cachedModalImg = document.getElementById('modalImage');
 
@@ -128,31 +112,31 @@ document.addEventListener("DOMContentLoaded", function() {
         modalContentWrap.addEventListener('touchstart', function(e) {
             if (e.touches.length === 1) {
                 if (currentScale > 1) {
-                    // 확대 상태에서는 사진 이동(드래그) 시작
                     isDragging = true;
-                    dragStartX = e.touches[0].clientX - lastTranslateX;
-                    dragStartY = e.touches[0].clientY - lastTranslateY;
+                    dragStartX = e.touches[0].clientX - translateX;
+                    dragStartY = e.touches[0].clientY - translateY;
                 } else if (!isZooming) {
-                    // 1배율일 때는 스와이프 시작
                     touchStartX = e.touches[0].screenX;
                 }
             } else if (e.touches.length === 2) {
-                // 두 손가락 핀치 줌 시작
+                // 핀치 줌 진입 시 변형 애니메이션을 즉시 제거하여 손가락 움직임과 1:1로 실시간 동기화
+                cachedModalImg.style.transition = 'none';
                 isZooming = true;
                 isDragging = false;
                 startDistance = getTouchDistance(e.touches[0], e.touches[1]);
+                lastScale = currentScale; // 현재 배율을 정확히 유지
             }
         }, { passive: true });
 
         modalContentWrap.addEventListener('touchmove', function(e) {
+            if (iscurrentScale > 1) e.preventDefault(); // 기본 스크롤 방지
+            
             if (!animationFrameId) {
                 animationFrameId = requestAnimationFrame(() => {
                     if (isDragging && e.touches.length === 1 && currentScale > 1) {
-                        // 💡 사진 자유 이동 (GPU 가속 Translate3D)
                         translateX = e.touches[0].clientX - dragStartX;
                         translateY = e.touches[0].clientY - dragStartY;
                         
-                        // 화면 바깥으로 너무 나가지 않게 경계선 제어
                         const maxBoundX = (window.innerWidth * currentScale) / 2.5;
                         const maxBoundY = (window.innerHeight * currentScale) / 2.5;
                         translateX = Math.max(Math.min(translateX, maxBoundX), -maxBoundX);
@@ -161,18 +145,25 @@ document.addEventListener("DOMContentLoaded", function() {
                         updateTransform();
                     } 
                     else if (isZooming && e.touches.length === 2) {
-                        // 💡 사진 확대/축소
                         const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-                        currentScale = Math.min(Math.max(lastScale * (currentDistance / startDistance), 1), 3);
-                        updateTransform();
+                        if (startDistance > 0) {
+                            const scaleFactor = currentDistance / startDistance;
+                            // 최소 1배에서 최대 3배까지 튀는 현상 없이 정밀 제어
+                            currentScale = Math.min(Math.max(lastScale * scaleFactor, 1), 3);
+                            updateTransform();
+                        }
                     }
                     animationFrameId = null;
                 });
             }
-            if (currentScale > 1) e.preventDefault(); // 스크롤 등 방지
         }, { passive: false });
 
         modalContentWrap.addEventListener('touchend', function(e) {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+
             if (isDragging && e.touches.length === 0) {
                 isDragging = false;
                 lastTranslateX = translateX;
@@ -180,16 +171,16 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             
             if (isZooming && e.touches.length < 2) {
-                lastScale = currentScale;
-                if (currentScale < 1.1) {
+                isZooming = false;
+                lastScale = currentScale; // 손을 떼는 순간의 배율을 오차 없이 그대로 고정
+                
+                // 1배율에 아주 가까워졌을 때만 부드럽게 원래 크기로 리셋
+                if (currentScale < 1.05) {
                     resetZoom();
-                    setTimeout(() => { isZooming = false; }, 300);
-                } else {
-                    setTimeout(() => { isZooming = false; }, 300);
                 }
             }
 
-            // 스와이프 판정 (1배율이고, 방금까지 줌/드래그를 하지 않았을 때만)
+            // 스와이프 판정 (정확히 1배율 상태에서만 작동하도록 제한)
             if (currentScale === 1 && e.changedTouches.length === 1 && !isZooming && !isDragging) {
                 touchEndX = e.changedTouches[0].screenX;
                 handleSwipe();
