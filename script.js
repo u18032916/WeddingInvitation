@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // 💡 7. 모바일 터치 제스처 (확대, 이동, 스와이프 로직 완벽 결합)
+    // 💡 7. 모바일 터치 제스처 (오타 수정 및 끊김 없는 줌 메커니즘 반영)
     const modalContentWrap = document.querySelector('.modal-content-wrap');
     cachedModalImg = document.getElementById('modalImage');
 
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     touchStartX = e.touches[0].screenX;
                 }
             } else if (e.touches.length === 2) {
-                // 두 손가락: 핀치 줌 시작 (애니메이션 끄기)
+                // 두 손가락 닿는 순간 CSS 트랜지션을 즉시 꺼서 손가락 움직임과 1:1로 반응하게 함
                 cachedModalImg.style.transition = 'none'; 
                 isZooming = true;
                 isDragging = false;
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }, { passive: true });
 
         modalContentWrap.addEventListener('touchmove', function(e) {
-            // [오타 수정 완료] 스크롤 방지 로직
+            // 💡 [수정 완료] 존재하지 않는 변수 오타를 올바른 변수(currentScale)로 정상 교체했습니다.
             if (currentScale > 1 || isZooming) e.preventDefault(); 
             
             if (!animationFrameId) {
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         translateX = e.touches[0].clientX - dragStartX;
                         translateY = e.touches[0].clientY - dragStartY;
                         
-                        // 화면 바깥으로 벗어나지 않게 바운더리 락 적용
+                        // 화면 바깥으로 너무 나가지 않도록 바운더리 제한
                         const maxBoundX = (window.innerWidth * currentScale) / 3;
                         const maxBoundY = (window.innerHeight * currentScale) / 3;
                         translateX = Math.max(Math.min(translateX, maxBoundX), -maxBoundX);
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         updateTransform();
                     } 
                     else if (isZooming && e.touches.length === 2) {
-                        // 핀치 줌 배율 계산 (최대 3배수)
+                        // 핀치 줌 계산
                         const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
                         if (startDistance > 0) {
                             const scaleFactor = currentDistance / startDistance;
@@ -170,17 +170,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 animationFrameId = null;
             }
 
-            // 터치 종료 시 드래그 상태 해제
             if (isDragging && e.touches.length === 0) {
                 isDragging = false;
             }
             
-            // 줌 종료 시 배율 유지 및 원상 복구 판정
             if (isZooming && e.touches.length < 2) {
                 isZooming = false;
-                lastScale = currentScale;
+                lastScale = currentScale; // 손가락을 떼는 순간의 배율 그대로 완벽 박제
                 
-                // 배율이 1에 근접하게 돌아오면 완전히 1배율로 자석처럼 맞춤
+                // 손가락을 놓았을 때 1배율에 수렴하면 자연스럽게 원상복구
                 if (currentScale <= 1.05) {
                     resetZoom();
                 }
@@ -223,7 +221,6 @@ function openModal() {
         document.body.classList.add('modal-open');
         modal.style.display = 'flex';
         
-        // 브라우저 히스토리 기록 추가 (가짜 주소)
         history.pushState({ modal: true }, '', '#gallery');
         
         setTimeout(() => { modal.classList.add('open'); }, 10); 
@@ -232,7 +229,7 @@ function openModal() {
 
 function closeModal() {
     if (location.hash === '#gallery') {
-        history.back(); // 뒤로가기를 강제로 실행하여 popstate 이벤트 유도
+        history.back(); 
     } else {
         closeModalUI();
     }
@@ -250,7 +247,7 @@ function closeModalUI() {
 }
 
 function moveModalImage(direction) {
-    if (!cachedModalImg || currentScale > 1) return; // 확대 상태에서는 넘기기 버튼 막기
+    if (!cachedModalImg || currentScale > 1) return; 
     
     const outClass = direction === 1 ? 'fade-out-next' : 'fade-out-prev';
     cachedModalImg.classList.add(outClass);
@@ -309,14 +306,12 @@ function getTouchDistance(touch1, touch2) {
     return Math.sqrt(Math.pow(touch1.screenX - touch2.screenX, 2) + Math.pow(touch1.screenY - touch2.screenY, 2));
 }
 
-// Translate3D와 Scale을 함께 적용하여 GPU 하드웨어 가속 처리
 function updateTransform() {
     if (cachedModalImg) {
         cachedModalImg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${currentScale})`;
     }
 }
 
-// 줌 및 이동 상태 초기화
 function resetZoom() {
     if (cachedModalImg) {
         cachedModalImg.style.transition = 'transform 0.25s ease-out, opacity 0.2s ease';
