@@ -22,11 +22,11 @@ body::before {
     70deg,
     #ffffff 0%,
     #ffffff 33%,
-    rgba(0, 0, 0, 0.04) 33.1%,
-    rgba(0, 0, 0, 0.04) 34.5%,
+    rgba(0, 0, 0, 0.06) 33.1%,
+    rgba(0, 0, 0, 0.06) 34.5%,
     #ffffff 48%,
-    rgba(0, 0, 0, 0.04) 48.1%,
-    rgba(0, 0, 0, 0.04) 49.5%,
+    rgba(0, 0, 0, 0.11) 48.1%,
+    rgba(0, 0, 0, 0.11) 49.5%,
     #ffffff 50%,
     rgba(0, 0, 0, 0.02) 63.1%,
     rgba(0, 0, 0, 0.02) 64.0%,
@@ -360,3 +360,23 @@ body.modal-open {
 .end-wrap.active { opacity: 1; }
 .end-logo { font-size: 32px; font-weight: 200; letter-spacing: 10px; margin-bottom: 20px; color: #000000; }
 .end-text { font-size: 13px; color: #888; letter-spacing: 1px; }
+
+.btn-kakao {
+  display: block;
+  width: 50%;
+  max-width: 300px;
+  margin: 30px auto 0;
+  padding: 15px;
+  background-color: #FEE500; /* 카카오 공식 옐로우 */
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.btn-kakao:active {
+  transform: scale(0.96);
+}
