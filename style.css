@@ -478,42 +478,38 @@ body.modal-open {
 .btn-copy:active, .btn-view:active, .gallery-thumbnail:active { transform: scale(0.95); }
 .gallery-thumbnail:hover { transform: scale(1.05); }
 
+/* 1. 엔딩 상자: 메인 사진처럼 부모 여백(20px) 안에서 정갈하게 가로 100% 차지 */
 .end-wrap {
   position: relative;
   width: 100%;
   
-  /* 💡 [추가] 방명록 메시지 남기기 버튼과의 사이에 100px의 충분한 공백을 만듭니다 */
+  /* 방명록과의 여백 */
   margin-top: 100px; 
-  
-  /* 기존 마이너스 마진 및 확장 코드 유지 */
-  margin-left: -20px;
   margin-bottom: 0;
-  width: calc(100% + 40px); 
   
-  aspect-ratio: 4 / 5; 
+  aspect-ratio: 4 / 5; /* 💡 일정한 세로형 직사각형 형태 유지 */
   overflow: hidden;
   display: flex;
-  align-items: center; 
-  justify-content: flex-start; 
+  align-items: center; /* 💡 사진의 세로 '중간' 지점에 글 상자 수직 정렬 */
+  justify-content: flex-start;
 }
 
-/* 💡 배경으로 꽉 채워질 이미지 설정 */
+/* 2. 엔딩 사진: 상자 안을 꽉 채우되, 글씨의 배경(absolute) 역할을 하도록 다시 지정 */
 .end-bg-photo {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
-  z-index: 1;
-  /* 글씨 가독성을 위해 사진을 살짝 차분하게 톤다운 (필요 없으면 제거 가능) */
-  filter: brightness(0.85); 
+  object-fit: cover; /* 사진이 찌그러지지 않게 박스에 맞춤 */
+  z-index: 1; /* 글씨보다 뒤로 가도록 설정 */
+  filter: brightness(0.85); /* 글씨 가독성을 위한 톤다운 */
 }
 
-/* 💡 사진 크기에 따라 유연하게 얹어지는 시 상자 */
+/* 3. 사진 위에 자연스럽게 얹어질 시 상자 */
 .end-poem-box {
   position: relative;
-  z-index: 2; /* 사진보다 위에 배치 */
-  padding-left: 40px; /* 왼쪽에서 자연스럽게 떨어지는 여백 조절 */
-  text-align: left; /* 💡 무조건 왼쪽 정렬 */
+  z-index: 2; /* 💡 사진(z-index: 1)보다 무조건 앞으로 튀어나오게 설정 */
+  padding-left: 30px; /* 왼쪽에서 자연스럽게 떨어지는 여백 */
+  text-align: left;
 }
 
 /* 💡 하얀색 왼쪽 정렬 자간 넓은 시 서식 */
