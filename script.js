@@ -351,6 +351,7 @@ function enterInvitation() {
 
     // 브라우저 락이 풀렸으므로 무한반복 BGM 재생 시작!
     if (audio && audio.paused) {
+        audio.currentTime = 7.2;
         audio.play().catch(err => console.log("BGM 자동재생 실패 방어:", err));
     }
 
@@ -362,3 +363,149 @@ function enterInvitation() {
         history.replaceState(null, '', location.pathname + location.search);
     }
 }
+
+// =========================================
+// FIREBASE 실시간 데이터베이스 연동 세팅
+// =========================================
+
+// 💡 [필수 필수] 2단계에서 본인이 발급받은 고유 firebaseConfig 내용으로 완전히 교체해 주세요!!
+const firebaseConfig = {
+  apiKey: "AIzaSyCYOyUHLIilpamdYoBdf2LI6e2_6hSWk60",
+  authDomain: "guestbook-a035c.firebaseapp.com",
+  databaseURL: "https://guestbook-a035c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "guestbook-a035c",
+  storageBucket: "guestbook-a035c.firebasestorage.app",
+  messagingSenderId: "1008314663390",
+  appId: "1:1008314663390:web:2285a187e8a990294b9d4f"
+};
+
+// 파이어베이스 엔진 초기화 구동
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// 💡 1. 전 세계 하객들이 글을 쓰는 순간 서버에 실시간 자동 누적 보관하는 함수
+// 💡 [수정] 메세지 남기기 터치 시 확인 팝업 안전장치 추가
+function submitGuestMessage() {
+    // 혹시 모를 브라우저의 자동 실행 동작을 원천 봉쇄
+    if (window.event) window.event.preventDefault();
+
+    const nameInput = document.getElementById('guestName');
+    const msgInput = document.getElementById('guestMsg');
+
+    if (!nameInput || !msgInput) return;
+
+    const name = nameInput.value.trim();
+    const msg = msgInput.value.trim();
+
+    if (!name || !msg) {
+        alert('이름과 축하 메시지를 모두 입력해 주세요.');
+        return;
+    }
+
+    // 🔥 핵심 안전장치: 모바일 브라우저에서도 절대 무시할 수 없게 window 객체를 명시하여 팝업을 강제 호출합니다.
+    const isConfirm = window.confirm('작성하신 축하 메시지를 방명록에 남기시겠습니까?');
+    
+    if (isConfirm === true) {
+        // [확인]을 눌렀을 때만 서버로 전송 진행
+        const guestbookRef = database.ref('guestbook');
+        guestbookRef.push({
+            name: name,
+            msg: msg,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            nameInput.value = '';
+            msgInput.value = '';
+        }).catch((error) => {
+            alert('저장 실패: ' + error.message);
+        });
+    } else {
+        // [취소]를 누르면 이 구역으로 떨어지며 아무 일도 일어나지 않고 팝업만 닫힙니다.
+        console.log("하객이 작성을 취소함");
+        return false;
+    }
+}
+
+// 💡 2. 서버의 'guestbook' 창고를 24시간 실시간 감시하며 글이 들어오면 화면에 바로 꽂아주는 감지기 (최고 핵심)
+database.ref('guestbook').orderByChild('timestamp').on('value', function(snapshot) {
+    const listContainer = document.getElementById('guestbookList');
+    if (!listContainer) return;
+
+    // 기존 화면에 머물러있던 더미나 이전 카드들 싹 청소
+    listContainer.innerHTML = '';
+
+    // 서버에서 뭉텅이로 가져온 방명록 데이터를 역순(최신순)으로 정렬하여 가로 카드 조립
+    const cardsArray = [];
+    snapshot.forEach(function(childSnapshot) {
+        const data = childSnapshot.val();
+        
+        const newCard = document.createElement('div');
+        newCard.className = 'guest-card';
+        
+        // 텍스트 기호 에러 방어 이스케이프
+        const escapedMsg = data.msg.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        newCard.setAttribute('onclick', `openGuestModal('${data.name}', '${escapedMsg}')`);
+
+        newCard.innerHTML = `
+            <div class="guest-card-name">${data.name}</div>
+            <div class="guest-card-divider"></div>
+            <div class="guest-card-msg">${data.msg}</div>
+        `;
+        
+        // 최신 글이 맨 왼쪽 앞으로 오도록 배열 처음에 수집
+        cardsArray.unshift(newCard);
+    });
+
+    // 화면 컨테이너에 순서대로 최종 드랍
+    cardsArray.forEach(card => listContainer.appendChild(card));
+});
+
+
+// =========================================
+// 방명록 모달창 제어 로직 (기존 구조 완벽 유지)
+// =========================================
+function openGuestModal(name, msg) {
+    const modal = document.getElementById('guestModal');
+    const modalName = document.getElementById('modalGuestName');
+    const modalMsg = document.getElementById('modalGuestMsg');
+
+    if (modal && modalName && modalMsg) {
+        modalName.innerText = name;
+        modalMsg.innerText = msg;
+        document.body.classList.add('modal-open');
+        modal.style.display = 'flex';
+        history.pushState({ guestModal: true }, '', '#guestbook');
+        setTimeout(() => { modal.classList.add('open'); }, 10);
+    }
+}
+
+function closeGuestModal() {
+    if (location.hash === '#guestbook') history.back();
+    else closeGuestModalUI();
+}
+
+function closeGuestModalUI() {
+    const modal = document.getElementById('guestModal');
+    if (modal) {
+        modal.classList.remove('open');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }, 400);
+    }
+}
+
+// 💡 히스토리 제어 감지 클래스에 방명록 모달 닫기 예외 조건 추가를 위해,
+// 기존 script.js 중반부에 있던 window.addEventListener('popstate') 구역을 아래 코드로 덮어써주시면 완벽합니다.
+window.addEventListener('popstate', function() {
+    const photoModal = document.getElementById('photoModal');
+    const guestModal = document.getElementById('guestModal');
+    
+    // 사진 모달 닫기 처리
+    if (photoModal && photoModal.classList.contains('open') && location.hash !== '#gallery') {
+        closeModalUI();
+    }
+    // 방명록 모달 닫기 처리
+    if (guestModal && guestModal.classList.contains('open') && location.hash !== '#guestbook') {
+        closeGuestModalUI();
+    }
+});

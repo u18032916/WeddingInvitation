@@ -208,23 +208,30 @@
     <div class="content-wrap">
       <div class="section-title">방명록</div>
       
-      <div class="guestbook-form">
-        <input type="text" placeholder="이름을 입력해주세요">
-        <textarea placeholder="축하의 메시지를 남겨주세요"></textarea>
-        <button class="btn-submit">메시지 남기기</button>
+      <div class="guestbook-swipe-container" id="guestbookList">
+        <div class="guest-card" onclick="openGuestModal('친구 김ㅇㅇ', '결혼 너무 축하해! 앞으로 꽃길만 걷자! 언제나 서로 아끼고 사랑하며 행복 가득한 가정 이루길 진심으로 기도할게.')">
+          <div class="guest-card-name">친구 김ㅇㅇ</div>
+          <div class="guest-card-divider"></div>
+          <div class="guest-card-msg">결혼 너무 축하해! 앞으로 꽃길만 걷자! 언제나 서로 아끼고 사랑하며 행복 가득한 가정 이루길 진심으로 기도할게.</div>
+        </div>
+        
+        <div class="guest-card" onclick="openGuestModal('삼촌 박ㅇㅇ', '두 사람의 새로운 출발을 축하한다. 서로 양보하고 존중하며 예쁜 사랑 하거라.')">
+          <div class="guest-card-name">삼촌 박ㅇㅇ</div>
+          <div class="guest-card-divider"></div>
+          <div class="guest-card-msg">두 사람의 새로운 출발을 축하한다. 서로 양보하고 존중하며 예쁜 사랑 하거라.</div>
+        </div>
       </div>
 
-      <div class="guest-list">
-        <div class="guest-item">
-          <div class="guest-name">친구 김ㅇㅇ</div>
-          <div class="guest-msg">결혼 너무 축하해! 앞으로 꽃길만 걷자!</div>
-        </div>
+      <div class="guestbook-form">
+        <input type="text" id="guestName" placeholder="이름을 입력해주세요">
+        <textarea id="guestMsg" placeholder="축하의 메시지를 남겨주세요"></textarea>
+        <button class="btn-submit" onclick="submitGuestMessage()">메시지 남기기</button>
       </div>
     </div>
     </div>
 
     <div class="end-wrap">
-      <!-- 배경으로 깔릴 하단 대표 사진 (본인의 이미지 경로로 수정하세요) -->
+
       <img src="images/kingboo3.png" alt="" class="end-bg-photo">
       
       <!-- 사진 위 중간 즈음에 위치할 하얀색 왼쪽 정렬 시 구절 -->
@@ -237,6 +244,15 @@
       </div>
     </div>
   </div> 
+  <div id="guestModal" class="modal-overlay">
+    <span class="modal-close" onclick="closeGuestModal()">&times;</span>
+    <div class="guest-modal-body">
+      <div id="modalGuestName" class="guest-modal-name"></div>
+      <div class="guest-card-divider" style="margin: 20px 0;"></div>
+      <div id="modalGuestMsg" class="guest-modal-msg"></div>
+    </div>
+  </div>
+
 
   <div id="photoModal" class="modal-overlay">
     <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -254,6 +270,8 @@
     <button class="modal-nav-btn modal-next" onclick="moveModalImage(1)">&#10095;</button>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
