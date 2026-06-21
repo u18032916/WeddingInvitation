@@ -8,7 +8,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="박현준 ♡ 이나연">
   <meta property="og:description" content="2026. 09. 19 (토) 오후 12:30 드레스 가든 청담">
-  <meta property="og:image" content="images/kingboo.png">
+  <meta property="og:image" content="images/MAIN.webp">
   <meta property="og:url" content="https://u18032916.github.io/WeddingInvitation/">
 </head>
 <body>
@@ -23,18 +23,30 @@
       <line id="lineBR" class="corner-line" x1="100%" y1="100%" x2="50%" y2="50%" />
     </svg>
 
-    <div id="enterBtn" class="center-rect-box" onclick="enterInvitation()">
-      <svg class="rect-svg" width="100%" height="100%">
-        <rect class="mask-rect" width="100%" height="100%" rx="4" />
-      </svg>
-      <div class="enter-text">초대합니다</div>
+    <div class="intro-interaction-wrap">
+      
+      <div class="enter-guide-top">▼ 터치하여 입장하기</div>
+
+      <div id="enterBtn" class="center-rect-box enhanced-size" onclick="enterInvitation()">
+        <svg class="rect-svg" width="100%" height="100%">
+          <rect class="mask-rect" width="100%" height="100%" rx="6" />
+        </svg>
+        <div class="enter-text">초대합니다</div>
+      </div>
+
+      <div class="pointer-finger-wrap">
+        <svg class="line-finger-svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 19V5m0 0l-4 4m4-4l4 4"/>
+        </svg>
+      </div>
+
     </div>
   </div>
 
   <div class="container">
     <div class="fade-in-up">
       <div class="main-photo-wrap">
-        <img src="images/kingboo.png" alt="" class="main-photo">
+        <img src="images/MAIN.webp" alt="" class="main-photo">
       </div>
     
     <div class="intro-wrap">
@@ -99,25 +111,32 @@
       <div class="section-title">갤러리</div>
       
       <div class="gallery-main-container" onclick="openModal()" style="cursor: pointer;">
-        <img src="images/kingboo.png" class="gallery-main active" id="mainImage1">
-        <img src="" class="gallery-main" id="mainImage2">
+        <img src="images/1.webp" class="gallery-main active" id="mainImage1">
+        <img src="images/1.webp" class="gallery-main" id="mainImage2">
       </div>
       
       <div class="gallery-container" style="position: relative; display: flex; align-items: center;">
         <button class="nav-btn prev" onclick="scrollGallery(-1)">◀</button>
         
         <div class="gallery-thumbnails" id="thumbContainer">
-          <img src="images/kingboo.png" class="gallery-thumbnail active">
-          <img src="images/kingboo2.png" class="gallery-thumbnail">
-          <img src="images/kingboo3.png" class="gallery-thumbnail">
-          <img src="images/kingboo.png" class="gallery-thumbnail">
-          <img src="images/kingboo2.png" class="gallery-thumbnail">
-          <img src="images/kingboo3.png" class="gallery-thumbnail">
-          <img src="images/kingboo.png" class="gallery-thumbnail">
-          <img src="images/kingboo2.png" class="gallery-thumbnail">
-          <img src="images/kingboo3.png" class="gallery-thumbnail">
-          <img src="images/kingboo.png" class="gallery-thumbnail">
-          <img src="images/kingboo.png" class="gallery-thumbnail">
+          <img src="images/1.webp" class="gallery-thumbnail active">
+          <img src="images/2.webp" class="gallery-thumbnail">
+          <img src="images/3.webp" class="gallery-thumbnail">
+          <img src="images/4.webp" class="gallery-thumbnail">
+          <img src="images/5.webp" class="gallery-thumbnail">
+          <img src="images/6.webp" class="gallery-thumbnail">
+          <img src="images/7.webp" class="gallery-thumbnail">
+          <img src="images/8.webp" class="gallery-thumbnail">
+          <img src="images/9.webp" class="gallery-thumbnail">
+          <img src="images/10.webp" class="gallery-thumbnail">
+          <img src="images/11.webp" class="gallery-thumbnail">
+          <img src="images/12.webp" class="gallery-thumbnail">
+          <img src="images/13.webp" class="gallery-thumbnail">
+          <img src="images/14.webp" class="gallery-thumbnail">
+          <img src="images/15.webp" class="gallery-thumbnail">
+          <img src="images/16.webp" class="gallery-thumbnail">
+          <img src="images/17.webp" class="gallery-thumbnail">
+          <img src="images/18.webp" class="gallery-thumbnail">
         </div>
         
         <button class="nav-btn next" onclick="scrollGallery(1)">▶</button>
@@ -209,17 +228,6 @@
       <div class="section-title">방명록</div>
       
       <div class="guestbook-swipe-container" id="guestbookList">
-        <div class="guest-card" onclick="openGuestModal('친구 김ㅇㅇ', '결혼 너무 축하해! 앞으로 꽃길만 걷자! 언제나 서로 아끼고 사랑하며 행복 가득한 가정 이루길 진심으로 기도할게.')">
-          <div class="guest-card-name">친구 김ㅇㅇ</div>
-          <div class="guest-card-divider"></div>
-          <div class="guest-card-msg">결혼 너무 축하해! 앞으로 꽃길만 걷자! 언제나 서로 아끼고 사랑하며 행복 가득한 가정 이루길 진심으로 기도할게.</div>
-        </div>
-        
-        <div class="guest-card" onclick="openGuestModal('삼촌 박ㅇㅇ', '두 사람의 새로운 출발을 축하한다. 서로 양보하고 존중하며 예쁜 사랑 하거라.')">
-          <div class="guest-card-name">삼촌 박ㅇㅇ</div>
-          <div class="guest-card-divider"></div>
-          <div class="guest-card-msg">두 사람의 새로운 출발을 축하한다. 서로 양보하고 존중하며 예쁜 사랑 하거라.</div>
-        </div>
       </div>
 
       <div class="guestbook-form">
@@ -232,7 +240,7 @@
 
     <div class="end-wrap">
 
-      <img src="images/kingboo3.png" alt="" class="end-bg-photo">
+      <img src="images/END.webp" alt="" class="end-bg-photo">
       
       <!-- 사진 위 중간 즈음에 위치할 하얀색 왼쪽 정렬 시 구절 -->
       <div class="end-poem-box">

@@ -50,7 +50,7 @@ body.modal-open {
   max-width: 480px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.7); /* 투명도를 0.92에서 0.95로 살짝 올려 글씨 가독성 확보 */
-  box-shadow: 0 4 30px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
 }
 
 .section-title {
@@ -188,6 +188,7 @@ body.modal-open {
   scrollbar-width: none;
   margin-top: 15px;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 .gallery-thumbnails::-webkit-scrollbar { display: none; }
 
@@ -244,6 +245,7 @@ body.modal-open {
   margin-bottom: 30px;
   scrollbar-width: none; /* 파이어폭스 스크롤 숨김 */
   -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
+  scroll-behavior: smooth;
 }
 .guestbook-swipe-container::-webkit-scrollbar { display: none; } /* 크롬 스크롤 숨김 */
 
@@ -538,9 +540,12 @@ body.modal-open {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background-color: #2c2d31; /* 💡 진한 회색 바탕색 */
+  
+  background-color: #2c2d31 !important; /* 💡 맑고 깊은 진한 회색 완벽 고정! */
+  
   z-index: 99999; /* 모든 요소를 뒤덮는 최상위 레이어 */
   display: flex;
+  flex-direction: column; /* 위아래 요소 정렬을 위해 추가 */
   justify-content: center;
   align-items: center;
   overflow: hidden;
@@ -584,13 +589,11 @@ body.modal-open {
 
 /* 💡 직사각형 면과 테두리 한붓그리기 핵심 연출 */
 .mask-rect {
-  fill: #2c2d31; /* 💡 바탕색과 완벽히 일치시켜 뒤쪽 X자 선을 마스킹하여 숨김 */
-  stroke: #ffffff; /* 💡 하얀색 테두리 */
+  fill: #2c2d31;
+  stroke: #ffffff;
   stroke-width: 1.5;
-  /* 한붓그리기를 위한 SVG 스트로크 연산 수치 (박스 둘레 길이 기준) */
-  stroke-dasharray: 480; 
-  stroke-dashoffset: 480;
-  /* 선 모임과 동시에 시계방향 한붓그리기 시작 */
+  stroke-dasharray: 600; /* 💡 480 -> 600으로 대폭 확장 */
+  stroke-dashoffset: 600; /* 💡 480 -> 600으로 대폭 확장 */
   animation: drawRect 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
 }
 
@@ -627,4 +630,95 @@ body.modal-open {
 .intro-overlay.fade-out {
   opacity: 0;
   visibility: hidden;
+}
+
+/* =========================================
+   INTRO CINEMATIC - 으르신 맞춤형 가이드 연출
+   ========================================= */
+
+/* 인트로 인터랙션 정렬 상자 */
+.intro-interaction-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+}
+
+/* 💡 5번 사양: 버튼 크기 대폭 확장 (으르신 터치 영역 확보) */
+.center-rect-box.enhanced-size {
+  width: 220px;  /* 기존 180px -> 220px로 확장 */
+  height: 70px;  /* 기존 60px -> 70px로 확장 */
+  margin: 15px 0;
+  
+  /* 💡 1번&4번 사양 통합: 3초 인트로 종료 후 통통 튀기(bounce) + 은은한 불빛(glow) 무한 작동 */
+  animation: enableTouch 3s forwards, 
+             bounceButton 1.5s ease-in-out 3s infinite,
+             glowButton 2s ease-in-out 3s infinite;
+}
+
+/* 💡 2번 사양: 버튼 위의 자막 (상단 페이드인) */
+.enter-guide-top {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 2px;
+  font-weight: 400;
+  opacity: 0;
+  transform: translateY(5px);
+  
+  /* 등장 페이드인(fadeInGuide) 후, 버튼과 싱크를 맞춰 무한 통통 튀기(bounceButton) 연결 */
+  animation: fadeInGuide 0.8s ease-out 1.5s forwards,
+             bounceButton 1.5s ease-in-out 3s infinite;
+}
+
+/* 💡 3번 사양: 버튼 밑에서 콕콕 찌르는 하얀 테두리 손가락 상자 */
+.pointer-finger-wrap {
+  width: 28px;
+  height: 28px;
+  margin-top: 10px;
+  opacity: 0;
+  /* 버튼 등장 타이밍에 맞춰 페이드인 후 무한으로 콕콕 위아래로 찌르는 애니메이션 가동 */
+  animation: fadeInGuide 0.8s ease-out 1.7s forwards, 
+             tapFinger 0.8s ease-in-out 1.7s infinite;
+}
+.line-finger-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================
+   시네마틱 통합 키프레임 애니메이션 정의
+   ========================================= */
+
+/* 1번 사양 키프레임: 버튼 통통 튀기 모션 */
+@keyframes bounceButton {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* 4번 사양 키프레임: 버튼 주변 은은한 화이트 아우라 Glow 효과 */
+@keyframes glowButton {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), 
+                inset 0 0 2px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.7), 
+                inset 0 0 10px rgba(255, 255, 255, 0.45);
+  }
+}
+
+/* 3번 사양 키프레임: 손가락이 위쪽 버튼을 향해 콕콕 찌르는 모션 */
+@keyframes tapFinger {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); } /* 위로 콕 찌르기 */
+}
+
+/* 상하단 가이드 요소 등장 페이드인 */
+@keyframes fadeInGuide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

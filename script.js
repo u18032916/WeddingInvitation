@@ -430,32 +430,41 @@ database.ref('guestbook').orderByChild('timestamp').on('value', function(snapsho
     const listContainer = document.getElementById('guestbookList');
     if (!listContainer) return;
 
-    // 기존 화면에 머물러있던 더미나 이전 카드들 싹 청소
     listContainer.innerHTML = '';
-
-    // 서버에서 뭉텅이로 가져온 방명록 데이터를 역순(최신순)으로 정렬하여 가로 카드 조립
     const cardsArray = [];
+
     snapshot.forEach(function(childSnapshot) {
         const data = childSnapshot.val();
         
+        // 💡 안전한 카드 Element 동적 생성 (XSS 원천 차단)
         const newCard = document.createElement('div');
         newCard.className = 'guest-card';
         
-        // 텍스트 기호 에러 방어 이스케이프
-        const escapedMsg = data.msg.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        newCard.setAttribute('onclick', `openGuestModal('${data.name}', '${escapedMsg}')`);
+        // 구조화된 내부 요소 생성
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'guest-card-name';
+        nameDiv.textContent = data.name; // textContent 사용으로 안전성 확보
 
-        newCard.innerHTML = `
-            <div class="guest-card-name">${data.name}</div>
-            <div class="guest-card-divider"></div>
-            <div class="guest-card-msg">${data.msg}</div>
-        `;
-        
-        // 최신 글이 맨 왼쪽 앞으로 오도록 배열 처음에 수집
+        const dividerDiv = document.createElement('div');
+        dividerDiv.className = 'guest-card-divider';
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'guest-card-msg';
+        msgDiv.textContent = data.msg;
+
+        // 조립
+        newCard.appendChild(nameDiv);
+        newCard.appendChild(dividerDiv);
+        newCard.appendChild(msgDiv);
+
+        // 💡 엔터/쌍따옴표 크래시 없는 안전한 클릭 이벤트 바인딩
+        newCard.addEventListener('click', function() {
+            openGuestModal(data.name, data.msg);
+        });
+
         cardsArray.unshift(newCard);
     });
 
-    // 화면 컨테이너에 순서대로 최종 드랍
     cardsArray.forEach(card => listContainer.appendChild(card));
 });
 
